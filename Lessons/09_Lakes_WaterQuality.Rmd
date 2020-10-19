@@ -29,7 +29,7 @@ library(LAGOSNE)
 theme_set(theme_classic())
 options(scipen = 100)
 
-lagosne_get(dest_folder = LAGOSNE:::lagos_path(), overwrite = TRUE)
+# lagosne_get(dest_folder = LAGOSNE:::lagos_path(), overwrite = TRUE)
 
 ```
 
@@ -213,7 +213,7 @@ stateTSIbar <- ggplot(LAGOStrophic, aes(x = state, fill = trophic.class)) +
   scale_fill_viridis_d(option = "magma", begin = 0.2, end = 0.8, direction = -1)
 print(stateTSIbar)
   
-stateTSIjitter <- ggplot(LAGOStrophic, aes(x = state, y = TSI.chl, color = season)) +
+stateTSIjitter <- ggplot(LAGOStrophic, aes(x = state, y = TSI.chl, fill = season)) +
   geom_rect(xmin = -1, xmax = 19, ymin = 0, ymax = 40,
             fill = "gray90", color = "gray90") +
   geom_rect(xmin = -1, xmax = 19, ymin = 40, ymax = 50,
@@ -222,15 +222,19 @@ stateTSIjitter <- ggplot(LAGOStrophic, aes(x = state, y = TSI.chl, color = seaso
             fill = "gray70", color = "gray70") +
   geom_rect(xmin = -1, xmax = 19, ymin = 70, ymax = 100,
             fill = "gray60", color = "gray60") +
-  geom_jitter(alpha = 0.3) +
+  # geom_jitter(alpha = 0.3) +
   # geom_hline(yintercept = 40, lty = 2) +
   # geom_hline(yintercept = 50, lty = 2) +
   # geom_hline(yintercept = 70, lty = 2) +
   labs(x = "", y = "TSI(chl)") +
+  geom_violin(draw_quantiles = 0.5) +
   scale_y_continuous(limits = c(0, 100)) +
   theme(legend.position = "top") +
-  scale_color_viridis_d(option = "magma")
+  scale_fill_viridis_d(option = "magma") 
+
 print(stateTSIjitter)
+
+write.csv(LAGOStrophic, file = "./Data/LAGOStrophic.csv", row.names = FALSE)
 
 ```
 What insights do we gain from the different visualizations?
@@ -240,6 +244,11 @@ What insights do we gain from the different visualizations?
 > Bar: 
 
 > Jitter:
+
+
+Other awesome functions: Ctr+Alt+I -> make a new code chunk
+Tab to help file directories
+
 
 ## Closing Discussion
 What factors might you expect to influence TSI scores in a given area? What are some variables in the LAGOSNE database that could help you test your hypothesis?

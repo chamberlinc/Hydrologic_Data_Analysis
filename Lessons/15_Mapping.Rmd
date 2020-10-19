@@ -73,7 +73,9 @@ We will be using the `st_as_sf` function today, which converts an object to a si
 
 ```{r}
 # generate a map of U.S. states
-states <- st_as_sf(map(database = "state", plot = TRUE, fill = TRUE, col = "white"))
+states <- st_as_sf(
+  map(database = "state", plot = TRUE, fill = TRUE, col = "white")
+  )
 
 # filter only states that are included in the LAGOSNE database
 states.subset <- filter(states, ID %in% 
@@ -102,7 +104,15 @@ LAGOScombined <-
   left_join(., LAGOSlimno) %>%
   left_join(., LAGOSstate) %>%
   filter(!is.na(state)) %>%
-  select(lagoslakeid, sampledate, secchi, lake_area_ha, maxdepth, nhd_lat, nhd_long, state)
+  select(
+    lagoslakeid, 
+    sampledate,
+    secchi,
+    lake_area_ha,
+    maxdepth,
+    nhd_lat,
+    nhd_long, state
+    )
 ```
 
 Notice that in the absence of specifying specific columns to join by, the `left_join` function will choose columns itself. The resulting data frame has the same amount of rows as the LAGOSnutrient data frame, minus any observations that listed state as NA. Be careful when relying on this functionality! Always double check your final data frame to make sure it contains the correct data and that your joins have proceeded as planned.
@@ -127,7 +137,9 @@ For today, we will use the EPSG projection 4326, also known by WGS 84. This proj
 
 ## Plotting secchi depths across LAGOSNE lakes
 ```{r}
-secchi.spatial <- st_as_sf(secchi.summary, coords = c("long", "lat"), crs = 4326)
+secchi.spatial <- st_as_sf(
+  secchi.summary, coords = c("long", "lat"), crs = 4326
+  )
 
 Secchiplot <- ggplot() +
   geom_sf(data = states.subset, fill = "white") +
@@ -177,19 +189,20 @@ We might want to visualize how monitoring efforts and secchi depths have changed
 ```{r}
 # add a "decade" column 
 LAGOScombined <- LAGOScombined %>%
-  mutate(decade = floor_date(sampledate, years (10)),
-         decade = year(decade))
+  mutate(decade = year(floor_date(sampledate, years (10))))
 
 # create a new summary data frame, with each lake divided by decade
 secchi.summary.decade <- LAGOScombined %>%
   group_by(lagoslakeid, decade) %>%
-  summarise(secchi.mean = mean(secchi),
+  summarise(secchi.mean = mean(secchi, na.rm = T),
             lat = mean(nhd_lat), 
             long = mean(nhd_long)) %>%
   drop_na()
 
 # create a simple features object
-secchi.decade.spatial <- st_as_sf(secchi.summary.decade, coords = c("long", "lat"), crs = 4326)
+secchi.decade.spatial <- st_as_sf(
+  secchi.summary.decade, coords = c("long", "lat"), crs = 4326
+  )
 
 # plot the data with decades as separate facets
 Secchiplot <- ggplot() +
@@ -220,7 +233,7 @@ Secchi.Animation <- ggplot() +
   enter_appear() +
   exit_disappear() 
 
-#anim_save('Secchi.Animation.gif', animate(Secchi.Animation, height = 400, wid = 600, renderer = gifski_renderer(loop = TRUE)))
+# anim_save('Secchi.Animation.gif', animate(Secchi.Animation, height = 400, wid = 600, renderer = gifski_renderer(loop = TRUE)))
 
 ```
 
